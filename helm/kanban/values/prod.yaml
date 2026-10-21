@@ -1,0 +1,14 @@
+replicaCount: 3 # Increased number of replicas
+
+image:
+  repository: ghcr.io/iagooteroc/kanban-platform
+  tag: latest # This should be a fixed version in prod
+  pullPolicy: IfNotPresent
+
+resources: # Higher resource limit
+  requests:
+    cpu: 25m
+    memory: 32Mi
+  limits:
+    cpu: 250m
+    memory: 128Mi
