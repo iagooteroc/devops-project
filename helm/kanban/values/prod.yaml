@@ -1,7 +1,7 @@
 replicaCount: 3 # Increased number of replicas
 
 image:
-  repository: ghcr.io/iagooteroc/kanban-platform
+  repository: ghcr.io/iagooteroc/devops-project
   tag: latest # This should be a fixed version in prod
   pullPolicy: IfNotPresent
 

@@ -7,7 +7,7 @@ spec:
   project: default
 
   source:
-    repoURL: https://github.com/iagooteroc/kanban-platform.git
+    repoURL: https://github.com/iagooteroc/devops-project.git
     targetRevision: main
     path: helm/kanban
     helm:
