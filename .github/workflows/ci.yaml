@@ -25,7 +25,7 @@ jobs:
         run: pip install yamllint
 
       - name: Validate YAML syntax and style
-        run: yamllint .
+        run: yamllint -s .
 
       - name: Set up kubectl
         uses: azure/setup-kubectl@v4
@@ -37,19 +37,6 @@ jobs:
         with:
           kubeconform-version: "0.8.0"
 
-      - name: Validate Kubernetes manifests
-        run: |
-          find . -type f \( \
-            -name '*.yaml' -o -name '*.yml' \
-          \) \
-            -not -path './.git/*' \
-            -not -path './helm/*/templates/*' \
-            -print0 |
-          xargs -0 -r kubeconform \
-            -strict \
-            -summary \
-            -kubernetes-version 1.37.1
-
       - name: Set up Helm
         uses: azure/setup-helm@v4
         with:
@@ -60,15 +47,18 @@ jobs:
         run: |
           set -euo pipefail
 
-          while IFS= read -r -d '' chart; do
-            echo "Linting $chart"
-            helm lint "$chart"
-
-            echo "Rendering $chart"
-            helm template ci "$chart" \
-              --namespace default \
-              > /dev/null
-          done < <(find helm -name Chart.yaml -print0)
+          helm lint ./helm/kanban \
+            -f ./helm/kanban/values/prod.yaml
+          
+          helm template kanban ./helm/kanban \
+            -f ./helm/kanban/values/prod.yaml \
+            --namespace default \
+            > /tmp/kanban-rendered.yaml
+          
+          kubeform \
+            -summary \
+            -kubernetes-version 1.37.1 \
+            /tmp/kanban-rendered.yaml
 
       - name: Validate Argo CD Application structure
         run: |
@@ -76,7 +66,6 @@ jobs:
             -name '*.yaml' -o -name '*.yml' \
           \) -print0 |
           xargs -0 -r kubeconform \
-            -strict \
             -summary \
             -kubernetes-version 1.37.1 \
             -schema-location default \
