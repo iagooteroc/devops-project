@@ -46,15 +46,12 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-
           helm lint ./helm/kanban \
             -f ./helm/kanban/values/prod.yaml
-          
           helm template kanban ./helm/kanban \
             -f ./helm/kanban/values/prod.yaml \
             --namespace default \
             > /tmp/kanban-rendered.yaml
-          
           kubeform \
             -summary \
             -kubernetes-version 1.37.1 \
